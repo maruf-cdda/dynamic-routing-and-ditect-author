@@ -1,13 +1,16 @@
-const { mkdir, writeFile, readdir } = require("fs");
+const { readdir } = require("fs");
 import { NextResponse } from "next/server";
+const path = require("path");
 import * as fs from "fs";
 
 const folderPath = "src/layout/components";
 
 export async function GET(request) {
     // request.headers.get("admin-key")
+    // const { searchParams } = new URL(request.url);
+    // console.log(searchParams.get("id"));
+
     const fileContent = [];
-    // console.log(content);
     var files = fs.readdirSync(folderPath);
 
     files.forEach((file) => {
@@ -38,3 +41,58 @@ export async function GET(request) {
 //         console.log("fileaaaaaaaaa", file);
 //     });
 // });
+
+export async function POST(request) {
+    const { path, repo } = await request.json();
+    const fileContent = [];
+    let folderOrFile = {};
+    // GET ALL FILES FROM A FOLDER
+    var files = fs.readdirSync(`${path}/${repo}`);
+    readdir(path, "utf8", (err, files) => {
+        if (err) throw err;
+        folderOrFile = checkExtensions(files);
+        // folderOrFile.push(...f);
+        // console.log("files", f);
+    });
+    console.log("folderOrFile", folderOrFile);
+
+    // GET AUTHOR, LAST MODIFIED, VERSION FROM EACH FILE
+    files.forEach((file) => {
+        const content = fs.readFileSync(`${path}/${repo}/${file}`, "utf8");
+        fileContent.push(parseCommentBlock(content));
+    });
+    return NextResponse.json({ data: fileContent }, { status: 200 });
+}
+
+// A FUNC TO DETECT AUTHOR, LAST MODIFIED, VERSION
+function parseCommentBlock(commentBlock) {
+    const regex = /\/\/\s*(AUTHOR|LAST MODIFIED|VERSION):\s*([\w\s.,]+)/g;
+    const result = {};
+    let match;
+
+    while ((match = regex.exec(commentBlock))) {
+        const key = match[1].replace(" ", "_");
+        const value = match[2].replace(/\s+/g, " ").trim();
+        if (key && value) {
+            result[key] = value;
+        }
+    }
+
+    return result;
+}
+
+// A FUNC TO CHECK FOLDERS OR FILES FROM A DIRECTORY
+function checkExtensions(filenames) {
+    const results = {};
+
+    filenames.forEach((filename) => {
+        const extension = path.extname(filename);
+        if (extension) {
+            results[filename] = true; // Has extension
+        } else {
+            results[filename] = false; // No extension
+        }
+    });
+
+    return results;
+}

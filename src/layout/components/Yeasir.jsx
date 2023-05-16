@@ -1,6 +1,8 @@
 // AUTHOR: Yeasir Arafat
-// LAST MODIFIED: 12/10/2021
-// VERSION: v1.0.0
+// LAST MODIFIED: 20 January, 2021
+// VERSION: v1.0.2
+//
+//
 
 const Yeasir = () => {
     return (

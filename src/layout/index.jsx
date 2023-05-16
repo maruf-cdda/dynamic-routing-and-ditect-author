@@ -6,16 +6,18 @@ const path = require("path");
 const Layout = ({ children }) => {
     useEffect(() => {
         const getData = async () => {
-            const res = await axios("/api/creator", {
-                headers: {
-                    "Content-Type": "application/json",
-                    "admin-key": "321#@",
-                },
-            });
+            const folderPath = path
+                .dirname(new URL(import.meta.url).pathname)
+                .split("next-13-explore")[1]
+                .slice(1);
+            const res = await axios.post(
+                "/api/creator",
+                { path: folderPath, repo: "components" },
+                { headers: { "Content-Type": "application/json" } }
+            );
             console.log(res);
         };
         getData();
-        console.log(path.dirname(new URL(import.meta.url).pathname).split("next-13-explore"));
     }, []);
     return <div>{children}</div>;
 };
