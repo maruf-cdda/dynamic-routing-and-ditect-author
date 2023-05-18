@@ -2,61 +2,39 @@ const { readdir } = require("fs");
 import { NextResponse } from "next/server";
 const path = require("path");
 import * as fs from "fs";
+import { cwd } from "node:process";
 
 const folderPath = "src/layout/components";
 
 export async function GET(request) {
-    // request.headers.get("admin-key")
-    // const { searchParams } = new URL(request.url);
-    // console.log(searchParams.get("id"));
+    const items = fs.readdirSync(folderPath);
+    const directoryContents = [];
 
-    const fileContent = [];
-    var files = fs.readdirSync(folderPath);
+    items.forEach((item) => {
+        const itemPath = `${folderPath}/${item}`;
+        const itemStats = fs.statSync(itemPath);
 
-    files.forEach((file) => {
-        const content = fs.readFileSync(`${folderPath}/${file}`, "utf8");
-        console.log(content.includes("Yeasir Arafat"));
-        // fileContent.push({ content });
+        if (itemStats.isFile()) {
+            const content = fs.readFileSync(itemPath, "utf8");
+            directoryContents.push({ type: "file", name: item, content });
+        } else if (itemStats.isDirectory()) {
+            directoryContents.push({ type: "folder", name: item });
+        }
     });
-    console.log("fileContent", fileContent);
-    return NextResponse.json({ data: files }, { status: 200 });
+
+    return NextResponse.json({ data: directoryContents }, { status: 200 });
 }
-
-// readFileSync -> If we use it, it will through err if this folder contain any folder. Only file is allowed.
-
-// writeFile(fileName, fileContent, (err) => {
-//     if (err) throw err;
-//     console.log("File created!");
-// });
-// readdir(folderName, "utf8", (err, files) => {
-//     if (err) throw err;
-//     console.log(files);
-// });
-
-// readdir(folderPath, "utf8", (err, files) => {
-//     if (err) throw err;
-//     console.log(files);
-//     files.forEach((file) => {
-//         // fileContent.push(...file);
-//         console.log("fileaaaaaaaaa", file);
-//     });
-// });
 
 export async function POST(request) {
     const { path, repo } = await request.json();
     const fileContent = [];
-    let folderOrFile = {};
     // GET ALL FILES FROM A FOLDER
     var files = fs.readdirSync(`${path}/${repo}`);
-    readdir(path, "utf8", (err, files) => {
-        if (err) throw err;
-        folderOrFile = checkExtensions(files);
-        // folderOrFile.push(...f);
-        // console.log("files", f);
-    });
-    console.log("folderOrFile", folderOrFile);
-
     // GET AUTHOR, LAST MODIFIED, VERSION FROM EACH FILE
+
+    const current_dir = cwd();
+    console.log("Current directory", current_dir.split("\\").slice(-1)[0]);
+
     files.forEach((file) => {
         const content = fs.readFileSync(`${path}/${repo}/${file}`, "utf8");
         fileContent.push(parseCommentBlock(content));
@@ -96,3 +74,46 @@ function checkExtensions(filenames) {
 
     return results;
 }
+
+// export async function GET(request) {
+//     // request.headers.get("admin-key")
+//     // const { searchParams } = new URL(request.url);
+//     // console.log(searchParams.get("id"));
+
+//     const fileContent = [];
+//     var files = fs.readdirSync(folderPath);
+
+//     files.forEach((file) => {
+//         const content = fs.readFileSync(`${folderPath}/${file}`, "utf8");
+//         console.log(content.includes("Yeasir Arafat"));
+//         // fileContent.push({ content });
+//     });
+//     console.log("fileContent", fileContent);
+//     return NextResponse.json({ data: files }, { status: 200 });
+// }
+
+// *************************************************************************************
+
+// readFileSync -> If we use it, it will through err if this folder contain any folder. Only file is allowed.
+
+// writeFile(fileName, fileContent, (err) => {
+//     if (err) throw err;
+//     console.log("File created!");
+// });
+// readdir(folderName, "utf8", (err, files) => {
+//     if (err) throw err;
+//     console.log(files);
+// });
+
+// readdir(folderPath, "utf8", (err, files) => {
+//     if (err) throw err;
+//     console.log(files);
+//     files.forEach((file) => {
+//         // fileContent.push(...file);
+//         console.log("fileaaaaaaaaa", file);
+//     });
+// });
+// readdir(path, "utf8", async (err, files) => {
+//     // if (err) throw err;
+//     console.log(checkExtensions(files));
+// });
