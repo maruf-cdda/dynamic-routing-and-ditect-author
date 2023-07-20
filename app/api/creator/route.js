@@ -1,3 +1,5 @@
+/** @format */
+
 const { readdir } = require("fs");
 import { NextResponse } from "next/server";
 const path = require("path");
@@ -16,7 +18,11 @@ export async function GET(request) {
 
         if (itemStats.isFile()) {
             const content = fs.readFileSync(itemPath, "utf8");
-            directoryContents.push({ type: "file", name: item, content });
+            directoryContents.push({
+                type: "file",
+                name: item,
+                author: parseCommentBlock(content),
+            });
         } else if (itemStats.isDirectory()) {
             directoryContents.push({ type: "folder", name: item });
         }
@@ -25,22 +31,22 @@ export async function GET(request) {
     return NextResponse.json({ data: directoryContents }, { status: 200 });
 }
 
-export async function POST(request) {
-    const { path, repo } = await request.json();
-    const fileContent = [];
-    // GET ALL FILES FROM A FOLDER
-    var files = fs.readdirSync(`${path}/${repo}`);
-    // GET AUTHOR, LAST MODIFIED, VERSION FROM EACH FILE
+// export async function POST(request) {
+//     const { path, repo } = await request.json();
+//     const fileContent = [];
+//     // GET ALL FILES FROM A FOLDER
+//     var files = fs.readdirSync(`${path}/${repo}`);
+//     // GET AUTHOR, LAST MODIFIED, VERSION FROM EACH FILE
 
-    const current_dir = cwd();
-    console.log("Current directory", current_dir.split("\\").slice(-1)[0]);
+//     const current_dir = cwd();
+//     console.log("Current directory", current_dir.split("\\").slice(-1)[0]);
 
-    files.forEach((file) => {
-        const content = fs.readFileSync(`${path}/${repo}/${file}`, "utf8");
-        fileContent.push(parseCommentBlock(content));
-    });
-    return NextResponse.json({ data: fileContent }, { status: 200 });
-}
+//     files.forEach((file) => {
+//         const content = fs.readFileSync(`${path}/${repo}/${file}`, "utf8");
+//         fileContent.push(parseCommentBlock(content));
+//     });
+//     return NextResponse.json({ data: fileContent }, { status: 200 });
+// }
 
 // A FUNC TO DETECT AUTHOR, LAST MODIFIED, VERSION
 function parseCommentBlock(commentBlock) {
