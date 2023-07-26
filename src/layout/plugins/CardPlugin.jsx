@@ -1,6 +1,7 @@
 /** @format */
 
 const CardPlugin = () => {
+    console.log("CardPlugin");
     return (
         <div className='bg-green-500'>
             <div>

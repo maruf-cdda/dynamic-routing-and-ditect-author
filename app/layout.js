@@ -1,3 +1,6 @@
+/** @format */
+"use client";
+import { PluginProvider } from "@/src/layout/components/PluginContext";
 import "./globals.css";
 import { Inter } from "next/font/google";
 
@@ -10,8 +13,10 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
     return (
-        <html lang="en">
-            <body className={inter.className}>{children}</body>
-        </html>
+        <PluginProvider>
+            <html lang='en'>
+                <body className={inter.className}>{children}</body>
+            </html>
+        </PluginProvider>
     );
 }

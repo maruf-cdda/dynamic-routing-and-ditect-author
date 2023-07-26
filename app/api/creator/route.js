@@ -114,10 +114,10 @@ function checkExtensions(filenames) {
 // readdir(folderPath, "utf8", (err, files) => {
 //     if (err) throw err;
 //     console.log(files);
-//     files.forEach((file) => {
-//         // fileContent.push(...file);
-//         console.log("fileaaaaaaaaa", file);
-//     });
+// files.forEach((file) => {
+//     // fileContent.push(...file);
+//     console.log("fileaaaaaaaaa", file);
+// });
 // });
 // readdir(path, "utf8", async (err, files) => {
 //     // if (err) throw err;
